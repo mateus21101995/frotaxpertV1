@@ -1,3 +1,4 @@
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -31,6 +32,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  bool _isConnected = true;
   final controller = WebViewController()
     ..setJavaScriptMode(JavaScriptMode.unrestricted)
     ..loadRequest(
@@ -41,6 +43,8 @@ class _MyHomePageState extends State<MyHomePage> {
     // TODO: implement initState
     super.initState();
     WebViewWidget(controller: controller);
+
+    checkInternetConnection();
   }
 
   @override
@@ -49,7 +53,24 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: WebViewWidget(controller: controller),
+      body: _isConnected
+          ? WebViewWidget(controller: controller)
+          : 
+              child: Center(
+                child: Text('Sem conexão'),
+              ),
+            
     );
+  }
+
+  Future<void> checkInternetConnection() async {
+    var connectivityResult = await Connectivity().checkConnectivity();
+    if (connectivityResult == ConnectivityResult.none) {
+      setState(() {
+        _isConnected = false;
+      });
+
+      print('Conexão $_isConnected');
+    }
   }
 }
